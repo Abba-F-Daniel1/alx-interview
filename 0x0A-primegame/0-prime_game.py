@@ -1,29 +1,34 @@
 #!/usr/bin/python3
-""" Module for solving prime game question """
+""" Prime Game """
 
-def isWinner(x, nums):
-    """function that checks for the winner"""
-    if not nums or x < 1:
-        return None
-    max_num = max(nums)
 
-    my_filter = [True for _ in range(max(max_num + 1, 2))]
-    for i in range(2, int(pow(max_num, 0.5)) + 1):
-        if not my_filter[i]:
-            continue
-        for j in range(i * i, max_num + 1, i):
-            my_filter[j] = False
-    my_filter[0] = my_filter[1] = False
-    y = 0
-    for i in range(len(my_filter)):
-        if my_filter[i]:
-            y += 1
-        my_filter[i] = y
-    player1 = 0
-    for x in nums:
-        player1 += my_filter[x] % 2 == 1
-    if player1 * 2 == len(nums):
+def generatePrimeNumbers(limit):
+    """Generate list of primes up to limit"""
+    primeNumbers = []
+    sieveList = [True] * (limit + 1)
+    for potentialPrime in range(2, limit + 1):
+        if sieveList[potentialPrime]:
+            primeNumbers.append(potentialPrime)
+            for multiple in range(potentialPrime, limit + 1, potentialPrime):
+                sieveList[multiple] = False
+    return primeNumbers
+
+
+def isWinner(numRounds, roundValues):
+    """
+    Determine the winner of the game
+    """
+    if not numRounds or not roundValues:
         return None
-    if player1 * 2 > len(nums):
-        return "Saheed"
-    return "Mama"
+    mariaScore = benScore = 0
+    for i in range(numRounds):
+        primes = generatePrimeNumbers(roundValues[i])
+        if len(primes) % 2 == 0:
+            benScore += 1
+        else:
+            mariaScore += 1
+    if mariaScore > benScore:
+        return "Maria"
+    elif benScore > mariaScore:
+        return "Ben"
+    return None
